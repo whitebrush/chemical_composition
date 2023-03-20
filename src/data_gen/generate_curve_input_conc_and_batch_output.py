@@ -5,7 +5,7 @@ import glob
 import generate_curve_input_conc_output
 
 def separate_features_and_labels(features: Dict, label_columns: list) -> Dict:
-  return generate_curve_input_conc_output.separate_features_and_labels(features, label_columns) + (features['label/'])
+  return generate_curve_input_conc_output.separate_features_and_labels(features, label_columns) + (features['metadata/batch_id'])
 
 def load_dataset(filename_pattern: Text, 
                  label_columns: list, 
