@@ -18,7 +18,8 @@ def decode(serialized_example):
           'label/5HT': tf.io.FixedLenFeature([1], tf.float32),
           'label/ME': tf.io.FixedLenFeature([1], tf.float32),
           'label/DA': tf.io.FixedLenFeature([1], tf.float32),
-          'label/NE': tf.io.FixedLenFeature([1], tf.float32), })
+          'label/NE': tf.io.FixedLenFeature([1], tf.float32), 
+          'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) })
 
   # NOTE: No need to cast these features, as they are already `tf.float32` values.
   return feature_tensors
