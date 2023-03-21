@@ -5,11 +5,11 @@ import glob
 from src.data_gen import generate_curve_input_conc_output
 
 def separate_features_and_labels(features: Dict, label_columns: list) -> Dict:
-  return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), tf.concat(
+  return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), (tf.concat(
     axis=-1,values=[features[label_columns[0]], 
                     features[label_columns[1]], 
                     features[label_columns[2]], 
-                    features[label_columns[3]]]), features['metadata/batch_id']
+                    features[label_columns[3]]]), features['metadata/batch_id'])
 
 def load_dataset(filename_pattern: Text, 
                  label_columns: list, 
