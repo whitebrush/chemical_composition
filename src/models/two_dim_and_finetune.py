@@ -5,7 +5,7 @@ import tensorflow as tf
 def load_pretrained_model(image_size, num_channels, include_top, weights, trainable, num_top_trainable_layers):
   pretrained_model = tf.keras.applications.MobileNetV2(
       input_shape=image_size + (num_channels,), 
-      include_top=False, 
+      include_top=include_top, 
       weights=weights)
   pretrained_model.trainable = trainable
   if trainable:
