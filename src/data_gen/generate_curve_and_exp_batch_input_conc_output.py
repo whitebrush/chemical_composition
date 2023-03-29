@@ -1,6 +1,7 @@
 import tensorflow as tf
 from typing import Dict, Optional, Text
 import glob
+import numpy as np
 
 from src.data_gen import generate_curve_input_conc_output
 
