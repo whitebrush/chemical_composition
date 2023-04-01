@@ -27,10 +27,13 @@ def build_CNN_2D_and_cotrain_bc_model():
   outputs_batch_id = tf.keras.layers.Dense(10, activation='softmax')(x_batch_id)
   model = tf.keras.Model(inputs, [outputs_conc, outputs_batch_id])
   base_learning_rate = 0.0001
+  tf.keras.backend.set_epsilon(0.1)
   model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-                loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_squared_error'), 
-                      tf.keras.losses.SparseCategoricalCrossentropy()],)
-                #metrics=[tf.keras.metrics.MeanAbsoluteError(), tf.keras.metrics.SparseCategoricalCrossentropy()])
+                loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
+                      tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),] ,
+                loss_weights=[0.5, 0.5],
+                metrics=['mape', 'mae'],
+                )
   return model, pretrained_model
 
 def train_CNN_2D_and_cotrain_bc_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir):
@@ -42,9 +45,11 @@ def train_CNN_2D_and_cotrain_bc_model(train_dataset, val_dataset, pretrained_epo
   model.save(model_path)
 
   pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
-  model.compile(loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_squared_error'),
-                      tf.keras.losses.SparseCategoricalCrossentropy()],
-                #metrics=tf.keras.metrics.MeanAbsoluteError(),
+  tf.keras.backend.set_epsilon(0.1)
+  model.compile(loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
+                      tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),] ,
+                loss_weights=[0.5, 0.5],
+                metrics=['mape', 'mae'],
                 optimizer = tf.keras.optimizers.RMSprop(learning_rate=10e-5))
 
   history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=100, validation_data=val_dataset)
