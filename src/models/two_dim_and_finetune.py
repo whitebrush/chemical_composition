@@ -37,9 +37,13 @@ def build_CNN_2D_and_finetune_model():
   outputs = tf.keras.layers.Dense(4)(x)
   model = tf.keras.Model(inputs, outputs)
   base_learning_rate = 0.0001
+  tf.keras.backend.set_epsilon(0.1)
   model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-                loss=tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_squared_error'),
-                metrics=tf.keras.metrics.MeanAbsoluteError())
+                loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
+                      tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),] ,
+                loss_weights=[0.5, 0.5],
+                metrics=['mape', 'mae'],
+                )
   return model, pretrained_model
 
 def train_CNN_2D_and_finetune_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir):
@@ -52,8 +56,11 @@ def train_CNN_2D_and_finetune_model(train_dataset, val_dataset, pretrained_epoch
   model.save(model_path)
 
   pretrained_model = freeze_layers(pretrained_model, 12)
-  model.compile(loss=tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_squared_error'),
-                metrics=tf.keras.metrics.MeanAbsoluteError(),
+  tf.keras.backend.set_epsilon(0.1)
+  model.compile(loss=[tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
+                      tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),] ,
+                loss_weights=[0.5, 0.5],
+                metrics=['mape', 'mae'],
                 optimizer = tf.keras.optimizers.RMSprop(learning_rate=10e-5))
   # model.summary()
   # pretrained_model.summary()
