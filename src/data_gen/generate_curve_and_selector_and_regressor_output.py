@@ -12,7 +12,7 @@ def one_hot_encoder_from_numpy(batch_id_numpy):
 
 def one_hot_encoder(batch_id_tensor):
   result = tf.numpy_function(one_hot_encoder_from_numpy, [batch_id_tensor], tf.double)
-  result = tf.reshape(result, (10, 1))
+  result = tf.reshape(result, (10, ))
   return result
 def separate_features_and_selector_as_labels(features: Dict) -> Dict:
   return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), tf.concat(
