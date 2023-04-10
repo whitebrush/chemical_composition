@@ -27,7 +27,7 @@ def build_CNN_2D_and_finetune_model():
                                            include_top=False, 
                                            weights='imagenet', 
                                            trainable=False, 
-                                           num_top_trainable_layers=0)
+                                           num_top_trainable_layers=0) 
   x = pretrained_model(inputs)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
