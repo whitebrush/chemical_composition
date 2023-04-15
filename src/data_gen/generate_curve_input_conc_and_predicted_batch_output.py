@@ -13,7 +13,7 @@ class CurveInputConcAndPredictedBatchOutputGenerator:
 
   def separate_features_and_labels(self, features: Dict, label_columns: list) -> Dict:
     input_features = tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg'])
-    print(self.batch_id_model.predict(input_features).shape)
+    print(self.batch_id_model(input_features).shape)
     return input_features, (self.batch_id_model(input_features), tf.concat(
       axis=-1,values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
