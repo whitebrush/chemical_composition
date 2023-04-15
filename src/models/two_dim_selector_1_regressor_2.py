@@ -48,6 +48,7 @@ def build_CNN_regressor_model():
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
   selector_inputs = tf.keras.Input(shape=(10, ))
+  reshaped_selector_inputs = tf.keras.layers.Reshape([10, 1])(selector_inputs)
   pretrained_model = two_dim_and_finetune.load_pretrained_model(
     image_size=image_size,
     num_channels=num_channels, 
@@ -63,7 +64,7 @@ def build_CNN_regressor_model():
     conc_regressors.append(two_dim_hard_regressor_selector.build_regressor(x))
   print(conc_regressors)
   x_conc = tf.stack(conc_regressors, axis=1)
-  x_conc = tf.keras.layers.Multiply()([x_conc, selector_inputs])
+  x_conc = tf.keras.layers.Multiply()([x_conc, reshaped_selector_inputs])
   x_conc = tf.keras.layers.Reshape([40])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear')(x_conc)
   print(outputs_conc)
