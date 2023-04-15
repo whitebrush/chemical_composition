@@ -35,8 +35,8 @@ class CurveInputConcAndPredictedBatchOutputGenerator:
     dataset = dataset.map(generate_curve_input_conc_output.decode, num_parallel_calls=2)
     dataset = dataset.filter(lambda x: tf.reduce_any(tf.math.is_nan(x['feature/image/avg'])) == False)
     dataset = dataset.map(lambda x: self.separate_features_and_labels(x, label_columns))
-    dataset = dataset.map(self.add_predicted_batch_id)
     dataset = dataset.repeat(repeat)
     dataset = dataset.shuffle(2048)
     dataset = dataset.batch(batch_size).prefetch(prefetch_size)
+    dataset = dataset.map(self.add_predicted_batch_id)
     return dataset
