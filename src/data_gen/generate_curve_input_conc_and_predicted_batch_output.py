@@ -14,8 +14,13 @@ class CurveInputConcAndPredictedBatchOutputGenerator:
   def separate_features_and_labels(self, features: Dict, label_columns: list) -> Dict:
     input_features = tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg'])
     print(self.batch_id_model(input_features).shape)
-    return input_features, (self.batch_id_model(input_features), tf.concat(
-      axis=-1,values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
+    return input_features, tf.concat(
+      axis=-1,values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]])
+
+  def add_predicted_batch_id(self, data_set):
+    image_features, conc_labels = data_set
+    return image_features, (self.batch_id_model(image_features), conc_labels)
+
 
   def load_dataset(self, 
                    filename_pattern: Text, 
@@ -30,6 +35,7 @@ class CurveInputConcAndPredictedBatchOutputGenerator:
     dataset = dataset.map(generate_curve_input_conc_output.decode, num_parallel_calls=2)
     dataset = dataset.filter(lambda x: tf.reduce_any(tf.math.is_nan(x['feature/image/avg'])) == False)
     dataset = dataset.map(lambda x: self.separate_features_and_labels(x, label_columns))
+    dataset = dataset.map(self.add_predicted_batch_id)
     dataset = dataset.repeat(repeat)
     dataset = dataset.shuffle(2048)
     dataset = dataset.batch(batch_size).prefetch(prefetch_size)
