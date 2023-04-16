@@ -69,7 +69,6 @@ def build_CNN_regressor_model():
   outputs_conc = tf.keras.layers.Dense(4, activation='linear')(x_conc)
   print(outputs_conc)
   model = tf.keras.Model([image_inputs, selector_inputs], outputs_conc)
-  model = tf.keras.Model([image_inputs, selector_inputs], outputs_conc)
   base_learning_rate = 0.0001
   tf.keras.backend.set_epsilon(0.1)
   model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
@@ -87,4 +86,5 @@ def train_CNN_regressor_model(train_dataset, val_dataset, total_epochs, model_di
   model.summary()
   history = model.fit(train_dataset, epochs=total_epochs, initial_epoch=0, validation_data=val_dataset)
   model_path = os.path.join(model_dir, 'regressor_model')
+  print(model_path)
   model.save(model_path)
