@@ -29,6 +29,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
                                            trainable=False, 
                                            num_top_trainable_layers=0)
   x = pretrained_model(image_inputs)
+  x = tf.keras.activations.linear()(x)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
   outputs_batch = build_batch_id_classifier(x)
