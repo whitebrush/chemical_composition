@@ -24,10 +24,17 @@ def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, labe
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
 def separate_features_and_gram_cam_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list) -> Dict:
-  gram_cam_tensors = []
-  for batch_id in range(10):
-    gram_cam_tensors.append(features['feature/image/avg/heatmap_%d' % batch_id])
-  return (tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), gram_cam_tensors), (one_hot_encoder(features['metadata/batch_id']), tf.concat(axis=-1,
+  return (tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), 
+          features['feature/image/avg/heatmap_0'],
+          features['feature/image/avg/heatmap_1'],
+          features['feature/image/avg/heatmap_2'],
+          features['feature/image/avg/heatmap_3'],
+          features['feature/image/avg/heatmap_4'],
+          features['feature/image/avg/heatmap_5'],
+          features['feature/image/avg/heatmap_6'],
+          features['feature/image/avg/heatmap_7'],
+          features['feature/image/avg/heatmap_8'],
+          features['feature/image/avg/heatmap_9']), (one_hot_encoder(features['metadata/batch_id']), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
 def load_dataset(filename_pattern: Text, 
