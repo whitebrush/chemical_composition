@@ -5,8 +5,8 @@ import tensorflow_addons as tfa
 from src.models import two_dim_and_finetune
 
 def build_regressor(x, x_grad_cam):
-  x_grad_cam = x_grad_cam.Reshape([-1])(x_grad_cam)
-  x_grad_cam = tf.keras.layers.Concatenate(x, x_grad_cam)
+  x_grad_cam = tf.keras.layers.Reshape([25])(x_grad_cam)
+  x = tf.keras.layers.Concatenate(axis=1)([x, x_grad_cam])
   x_conc = tf.keras.layers.Dropout(0.2)(x)
   x_conc = tf.keras.layers.Dense(16)(x_conc)
   x_conc = tf.keras.layers.Dropout(0.2)(x_conc)
@@ -44,7 +44,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   conc_regressors = []
   grad_cam_inputs = []
   for i in range(10):
-    grad_cam_inputs.append(tf.keras.Input(shape=[5,5]))
+    grad_cam_inputs.append(tf.keras.Input(shape=[5, 5]))
     conc_regressors.append(build_regressor(x, grad_cam_inputs[i]))
   x_conc = tf.stack(conc_regressors, axis=1)
   x_conc = tf.keras.layers.Multiply()([x_conc, one_hot_predicted_batch])
