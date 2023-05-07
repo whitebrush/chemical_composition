@@ -2,12 +2,10 @@ import tensorflow as tf
 from typing import Dict, Optional, Text
 import glob
 
-def decode(serialized_example):
+def decode(serialized_example, add_gram_cam_features=False):
   # Decode examples stored in TFRecord
   # NOTE: make sure to specify the correct dimensions for the images
-  feature_tensors = tf.io.parse_single_example(
-      serialized_example,
-      features={
+  feature_map = {
           'feature/image/avg': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/diff': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/derivative_1': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
@@ -19,7 +17,13 @@ def decode(serialized_example):
           'label/ME': tf.io.FixedLenFeature([1], tf.float32),
           'label/DA': tf.io.FixedLenFeature([1], tf.float32),
           'label/NE': tf.io.FixedLenFeature([1], tf.float32), 
-          'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) })
+          'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) }
+  if add_gram_cam_features:
+    for batch_id in range(10):
+      feature_map['feature/image/avg/heatmap_%d' % batch_id] = tf.io.FixedLenFeature([5, 5], tf.float32)
+  feature_tensors = tf.io.parse_single_example(
+      serialized_example,
+      features=feature_map)
 
   # NOTE: No need to cast these features, as they are already `tf.float32` values.
   return feature_tensors
