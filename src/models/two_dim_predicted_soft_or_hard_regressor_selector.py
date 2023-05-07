@@ -52,7 +52,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   return model, pretrained_model
 
 
-def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir, use_hard_selector = True):
+def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir, use_hard_selector=True):
   model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector)
   pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
   model.summary()
