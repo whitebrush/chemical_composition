@@ -36,17 +36,17 @@ def load_dataset(filename_pattern: Text,
                  prefetch_size: int, 
                  repeat: Optional[int] = None,
                  one_hot_batch_id_as_label: bool = False,
-                 add_gram_cam_features: bool = False):
+                 add_grad_cam_features: bool = False):
   filenames = [filename_pattern] if '*' not in filename_pattern else glob.glob(filename_pattern)
   print(filenames)
   dataset = tf.data.Dataset.list_files(filenames).interleave(
       lambda filepath: tf.data.TFRecordDataset(filepath), cycle_length=2,)
-  if add_gram_cam_features:
+  if add_grad_cam_features:
     dataset = dataset.map(lambda x: generate_curve_input_conc_output.decode(x, True), num_parallel_calls=2)
   else:
     dataset = dataset.map(generate_curve_input_conc_output.decode, num_parallel_calls=2)
   dataset = dataset.filter(lambda x: tf.reduce_any(tf.math.is_nan(x['feature/image/avg'])) == False)
-  if add_gram_cam_features:
+  if add_grad_cam_features:
     dataset = dataset.map(lambda x: separate_features_and_gram_cam_features_and_labels_one_hot_batch_id_as_labels(x, label_columns))
   elif not one_hot_batch_id_as_label:
     dataset = dataset.map(lambda x: separate_features_and_labels(x, label_columns))
