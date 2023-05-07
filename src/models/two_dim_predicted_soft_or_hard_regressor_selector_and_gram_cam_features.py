@@ -4,7 +4,9 @@ import tensorflow_addons as tfa
 
 from src.models import two_dim_and_finetune
 
-def build_regressor(x):
+def build_regressor(x, x_grad_cam):
+  x_grad_cam = x_grad_cam.Reshape([-1])(x_grad_cam)
+  x_grad_cam = tf.keras.layers.Concatenate(x, x_grad_cam)
   x_conc = tf.keras.layers.Dropout(0.2)(x)
   x_conc = tf.keras.layers.Dense(16)(x_conc)
   x_conc = tf.keras.layers.Dropout(0.2)(x_conc)
@@ -40,14 +42,16 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
     one_hot_predicted_batch = tf.keras.layers.Reshape([10, 1])(outputs_batch)
 
   conc_regressors = []
+  grad_cam_inputs = []
   for i in range(10):
-    conc_regressors.append(build_regressor(x))
+    grad_cam_inputs.append(tf.keras.Input(shape=[5,5]))
+    conc_regressors.append(build_regressor(x, grad_cam_inputs[i]))
   x_conc = tf.stack(conc_regressors, axis=1)
   x_conc = tf.keras.layers.Multiply()([x_conc, one_hot_predicted_batch])
   x_conc = tf.keras.layers.Reshape([40])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear', name='outputs_conc')(x_conc)
   tf.keras.backend.set_epsilon(0.1)
-  model = tf.keras.Model(image_inputs, [outputs_batch, outputs_conc])
+  model = tf.keras.Model([image_inputs, grad_cam_inputs], [outputs_batch, outputs_conc])
   print("epsilon: = ", tf.keras.backend.epsilon())
   return model, pretrained_model
 
