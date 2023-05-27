@@ -52,16 +52,22 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   return model, pretrained_model
 
 
-def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir, use_hard_selector=True):
-  model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector)
-  pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
-  model.summary()
-  model.compile(loss={'outputs_batch': 'categorical_crossentropy',
-                      'outputs_conc': [tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
-                      tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),]},
-                loss_weights=[0.8, [0.05, 0.15]],
-                metrics=['accuracy', ['mae', 'mape']],
-                optimizer = tf.keras.optimizers.RMSprop(learning_rate=10e-5))
-  model.fit(train_dataset, epochs=total_epochs, initial_epoch=pretrained_epochs, validation_data=val_dataset)
-  model_path = os.path.join(model_dir, 'model')
-  model.save(model_path)
+def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir, use_hard_selector=True, fine_tune=False):
+  if not fine_tune:
+    model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector)
+    pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
+    model.summary()
+    model.compile(loss={'outputs_batch': 'categorical_crossentropy',
+                        'outputs_conc': [tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
+                        tf.keras.losses.MeanAbsolutePercentageError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_percentage_error'),]},
+                  loss_weights=[0.8, [0.05, 0.15]],
+                  metrics=['accuracy', ['mae', 'mape']],
+                  optimizer = tf.keras.optimizers.RMSprop(learning_rate=10e-5))
+    model.fit(train_dataset, epochs=total_epochs, initial_epoch=pretrained_epochs, validation_data=val_dataset)
+    model_path = os.path.join(model_dir, 'model')
+    model.save(model_path)
+  else:
+    model = tf.keras.models.load_model(os.path.join(model_dir, 'model'))
+    history_fine = model.fit(train_dataset, epochs=total_epochs, validation_data=val_dataset)
+    model_path = os.path.join(model_dir, 'fine_tune_unseen_model')
+    model.save(model_path)
