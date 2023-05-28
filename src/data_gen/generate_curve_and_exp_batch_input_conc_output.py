@@ -23,6 +23,10 @@ def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, labe
   return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), (one_hot_encoder(features['metadata/batch_id']), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
+def separate_features_and_labels_with_batch_id_as_labels(features: Dict, label_columns: list) -> Dict:
+  return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), (features['metadata/batch_id'], tf.concat(axis=-1,
+              values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
+
 def separate_features_and_gram_cam_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list) -> Dict:
   return (tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), 
           features['feature/image/avg/heatmap_0'],
@@ -43,7 +47,8 @@ def load_dataset(filename_pattern: Text,
                  prefetch_size: int, 
                  repeat: Optional[int] = None,
                  one_hot_batch_id_as_label: bool = False,
-                 add_grad_cam_features: bool = False):
+                 add_grad_cam_features: bool = False,
+                 use_one_hot_function: bool = True):
   filenames = [filename_pattern] if '*' not in filename_pattern else glob.glob(filename_pattern)
   print(filenames)
   dataset = tf.data.Dataset.list_files(filenames).interleave(
@@ -57,6 +62,8 @@ def load_dataset(filename_pattern: Text,
     dataset = dataset.map(lambda x: separate_features_and_gram_cam_features_and_labels_one_hot_batch_id_as_labels(x, label_columns))
   elif not one_hot_batch_id_as_label:
     dataset = dataset.map(lambda x: separate_features_and_labels(x, label_columns))
+  elif not use_one_hot_function:
+    dataset = dataset.map(lambda x: separate_features_and_labels_with_batch_id_as_labels(x, label_columns))
   else:
     dataset = dataset.map(lambda x: separate_features_and_labels_one_hot_batch_id_as_labels(x, label_columns))
   dataset = dataset.repeat(repeat)
