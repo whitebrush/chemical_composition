@@ -13,8 +13,8 @@ def decode(serialized_example, add_gram_cam_features=False):
           'feature/image/derivative_3': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/derivative_4': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/derivative_5': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
-          'label/5HT': tf.io.FixedLenFeature([1], tf.float32),
-          'label/ME': tf.io.FixedLenFeature([1], tf.float32),
+          'label/5-HT': tf.io.FixedLenFeature([1], tf.float32),
+          'label/MEL': tf.io.FixedLenFeature([1], tf.float32),
           'label/DA': tf.io.FixedLenFeature([1], tf.float32),
           'label/NE': tf.io.FixedLenFeature([1], tf.float32), 
           'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) }
