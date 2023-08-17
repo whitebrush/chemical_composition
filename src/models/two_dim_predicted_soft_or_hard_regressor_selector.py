@@ -15,7 +15,7 @@ def build_batch_id_classifier(x):
   x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
   x_batch = tf.keras.layers.Dropout(0.2)(x_batch)
-  outputs_batch = tf.keras.layers.Dense(16, activation='softmax', name='outputs_batch')(x_batch)
+  outputs_batch = tf.keras.layers.Dense(17, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
 
 def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector=True):
