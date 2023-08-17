@@ -7,6 +7,7 @@ from src.data_gen import generate_curve_input_conc_output
 
 def one_hot_encoder_from_numpy(batch_id_numpy):
   encoded_batch = np.array([0.0] * 17)
+  print("batch_id_number: int(batch_id_numpy[0])", int(batch_id_numpy[0]))
   encoded_batch[int(batch_id_numpy[0])] = 1.0
   return encoded_batch
 
