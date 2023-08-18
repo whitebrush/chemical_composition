@@ -19,7 +19,7 @@ def decode(serialized_example, add_gram_cam_features=False):
           'label/NE': tf.io.FixedLenFeature([1], tf.float32), 
           'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) }
   if add_gram_cam_features:
-    for batch_id in range(10):
+    for batch_id in range(16):
       feature_map['feature/image/avg/heatmap_%d' % batch_id] = tf.io.FixedLenFeature([5, 5], tf.float32)
   feature_tensors = tf.io.parse_single_example(
       serialized_example,
