@@ -6,14 +6,14 @@ import numpy as np
 from src.data_gen import generate_curve_input_conc_output
 
 def one_hot_encoder_from_numpy(batch_id_numpy):
-  encoded_batch = np.array([0.0] * 17)
+  encoded_batch = np.array([0.0] * 16)
   print("batch_id_number: int(batch_id_numpy[0])", int(batch_id_numpy[0]))
   encoded_batch[int(batch_id_numpy[0])] = 1.0
   return encoded_batch
 
 def one_hot_encoder(batch_id_tensor):
   result = tf.numpy_function(one_hot_encoder_from_numpy, [batch_id_tensor], tf.double)
-  result = tf.reshape(result, (17, ))
+  result = tf.reshape(result, (16, ))
   return result
   
 def separate_features_and_labels(features: Dict, label_columns: list) -> Dict:
