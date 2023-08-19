@@ -6,9 +6,10 @@ from src.models import two_dim_and_finetune
 
 def build_regressor(x, x_grad_cam):
   x_grad_cam = tf.keras.layers.Reshape([25])(x_grad_cam)
-  x = tf.keras.layers.Concatenate(axis=1)([x, x_grad_cam])
+  x_grad_cam_dense = tf.keras.layers.Dense(4)(x_grad_cam)
   x_conc = tf.keras.layers.Dropout(0.2)(x)
   x_conc = tf.keras.layers.Dense(16)(x_conc)
+  x_conc = tf.keras.layers.Concatenate(axis=1)([x_conc, x_grad_cam_dense])
   x_conc = tf.keras.layers.Dropout(0.2)(x_conc)
   x_conc = tf.keras.layers.Dense(4)(x_conc)
   return x_conc
@@ -25,10 +26,10 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
   pretrained_model = two_dim_and_finetune.load_pretrained_model(image_size=image_size,
-                                           num_channels=num_channels, 
-                                           include_top=False, 
-                                           weights='imagenet', 
-                                           trainable=False, 
+                                           num_channels=num_channels,
+                                           include_top=False,
+                                           weights='imagenet',
+                                           trainable=False,
                                            num_top_trainable_layers=0)
   x = pretrained_model(image_inputs)
   x = tf.keras.layers.Activation('linear', name='activation')(x)
@@ -51,7 +52,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   x_conc = tf.keras.layers.Reshape([40])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear', name='outputs_conc')(x_conc)
   tf.keras.backend.set_epsilon(0.1)
-  model = tf.keras.Model([image_inputs, grad_cam_inputs], [outputs_batch, outputs_conc])
+  model = tf.keras.Model([image_inputs, grad_cam_inputs[0], grad_cam_inputs[1],grad_cam_inputs[2],grad_cam_inputs[3],grad_cam_inputs[4],grad_cam_inputs[5],grad_cam_inputs[6],grad_cam_inputs[7],grad_cam_inputs[8],grad_cam_inputs[9]], [outputs_batch, outputs_conc])
   print("epsilon: = ", tf.keras.backend.epsilon())
   return model, pretrained_model
 
