@@ -15,7 +15,7 @@ def build_CNN_2D_hard_regressor_selector_model():
   image_size = (160, 160)
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
-  batch_inputs = tf.keras.Input(shape=(10, 1))
+  batch_inputs = tf.keras.Input(shape=(16, 1))
   pretrained_model = two_dim_and_finetune.load_pretrained_model(image_size=image_size,
                                            num_channels=num_channels, 
                                            include_top=False, 
@@ -27,7 +27,7 @@ def build_CNN_2D_hard_regressor_selector_model():
   x = tf.keras.layers.Normalization()(x)
 
   conc_regressors = []
-  for i in range(10):
+  for i in range(16):
     conc_regressors.append(build_regressor(x))
   print(conc_regressors)
   x_conc = tf.stack(conc_regressors, axis=1)
