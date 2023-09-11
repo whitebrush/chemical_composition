@@ -24,8 +24,8 @@ def build_CNN_selector_model():
   x_batch_id = tf.keras.layers.Dropout(0.2)(x_batch_id)
   x_batch_id = tf.keras.layers.Dense(16)(x_batch_id)
   x_batch_id = tf.keras.layers.Dropout(0.2)(x_batch_id)
-  outputs_batch_id = tf.keras.layers.Dense(10, activation='softmax')(x_batch_id)
-  outputs_one_hot_predicted_batch = tf.keras.layers.Reshape([10])(outputs_batch_id)
+  outputs_batch_id = tf.keras.layers.Dense(16, activation='softmax')(x_batch_id)
+  outputs_one_hot_predicted_batch = tf.keras.layers.Reshape([16])(outputs_batch_id)
   model = tf.keras.Model(inputs, outputs_one_hot_predicted_batch)
   base_learning_rate = 0.0001
   tf.keras.backend.set_epsilon(0.1)
@@ -47,8 +47,8 @@ def build_CNN_regressor_model():
   image_size = (160, 160)
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
-  selector_inputs = tf.keras.Input(shape=(10, ))
-  reshaped_selector_inputs = tf.keras.layers.Reshape([10, 1])(selector_inputs)
+  selector_inputs = tf.keras.Input(shape=(16, ))
+  reshaped_selector_inputs = tf.keras.layers.Reshape([16, 1])(selector_inputs)
   pretrained_model = two_dim_and_finetune.load_pretrained_model(
     image_size=image_size,
     num_channels=num_channels, 
@@ -60,7 +60,7 @@ def build_CNN_regressor_model():
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
   conc_regressors = []
-  for i in range(10):
+  for i in range(16):
     conc_regressors.append(two_dim_hard_regressor_selector.build_regressor(x))
   print(conc_regressors)
   x_conc = tf.stack(conc_regressors, axis=1)
