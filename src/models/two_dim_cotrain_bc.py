@@ -24,7 +24,7 @@ def build_CNN_2D_and_cotrain_bc_model():
   x_batch_id = tf.keras.layers.Dropout(0.2)(x)
   x_batch_id = tf.keras.layers.Dense(16)(x_batch_id)
   x_batch_id = tf.keras.layers.Dropout(0.2)(x_batch_id)
-  outputs_batch_id = tf.keras.layers.Dense(10, activation='softmax')(x_batch_id)
+  outputs_batch_id = tf.keras.layers.Dense(16, activation='softmax')(x_batch_id)
   model = tf.keras.Model(inputs, [outputs_conc, outputs_batch_id])
   base_learning_rate = 0.0001
   tf.keras.backend.set_epsilon(0.1)

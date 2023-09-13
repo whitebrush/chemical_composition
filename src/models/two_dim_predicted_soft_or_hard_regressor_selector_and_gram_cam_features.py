@@ -18,7 +18,7 @@ def build_batch_id_classifier(x):
   x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
   x_batch = tf.keras.layers.Dropout(0.2)(x_batch)
-  outputs_batch = tf.keras.layers.Dense(10, activation='softmax', name='outputs_batch')(x_batch)
+  outputs_batch = tf.keras.layers.Dense(16, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
 
 def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector=True):
@@ -38,13 +38,13 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   outputs_batch = build_batch_id_classifier(x)
   if use_hard_selector:
     x_batch = tfa.seq2seq.hardmax(outputs_batch)
-    one_hot_predicted_batch = tf.keras.layers.Reshape([10, 1])(x_batch)
+    one_hot_predicted_batch = tf.keras.layers.Reshape([16, 1])(x_batch)
   else:
-    one_hot_predicted_batch = tf.keras.layers.Reshape([10, 1])(outputs_batch)
+    one_hot_predicted_batch = tf.keras.layers.Reshape([16, 1])(outputs_batch)
 
   conc_regressors = []
   grad_cam_inputs = []
-  for i in range(10):
+  for i in range(16):
     grad_cam_inputs.append(tf.keras.Input(shape=[5, 5]))
     conc_regressors.append(build_regressor(x, grad_cam_inputs[i]))
   x_conc = tf.stack(conc_regressors, axis=1)
