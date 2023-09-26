@@ -17,6 +17,7 @@ class CurveInputConcAndPredictedBatchOutputGenerator:
       axis=-1,values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]])
 
   def add_predicted_batch_id(self, image_features, conc_labels):
+    print(self.batch_id_model(image_features))
     return (image_features, self.batch_id_model(image_features)), conc_labels
 
 
