@@ -23,6 +23,7 @@ def build_CNN_2D_hard_regressor_selector_model():
                                            trainable=False, 
                                            num_top_trainable_layers=0)
   x = pretrained_model(image_inputs)
+  x = tf.keras.layers.Activation('linear', name='activation')(x)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
 

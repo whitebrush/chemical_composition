@@ -15,6 +15,7 @@ def build_CNN_2D_and_cotrain_bc_model():
     trainable=False, 
     num_top_trainable_layers=0)
   x = pretrained_model(inputs)
+  x = tf.keras.layers.Activation('linear', name='activation')(x)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
   x_conc = tf.keras.layers.Dropout(0.2)(x)
