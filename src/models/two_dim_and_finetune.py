@@ -52,7 +52,7 @@ def train_CNN_2D_and_finetune_model(train_dataset, val_dataset, pretrained_epoch
     model, pretrained_model = build_CNN_2D_and_finetune_model()
     # model.summary()
     # pretrained_model.summary()
-    history = model.fit(train_dataset, epochs=pretrained_epochs, validation_data=val_dataset)
+    model.fit(train_dataset, epochs=pretrained_epochs, validation_data=val_dataset)
 
     model_path = os.path.join(model_dir, 'pre_trained_repr')
     model.save(model_path)
@@ -67,12 +67,12 @@ def train_CNN_2D_and_finetune_model(train_dataset, val_dataset, pretrained_epoch
     # model.summary()
     # pretrained_model.summary()
 
-    history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=100, validation_data=val_dataset)
+    model.fit(train_dataset, epochs=total_epochs, initial_epoch=100, validation_data=val_dataset)
 
     model_path = os.path.join(model_dir, 'model')
     model.save(model_path)
   else:
     model = tf.keras.models.load_model(os.path.join(model_dir, 'model'))
-    history_fine = model.fit(train_dataset, epochs=total_epochs, validation_data=val_dataset)
+    model.fit(train_dataset, epochs=total_epochs, validation_data=val_dataset)
     model_path = os.path.join(model_dir, 'fine_tune_unseen_model')
     model.save(model_path)

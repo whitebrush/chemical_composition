@@ -14,14 +14,14 @@ def build_regressor(x, x_grad_cam):
   x_conc = tf.keras.layers.Dense(4)(x_conc)
   return x_conc
 
-def build_batch_id_classifier(x):
+def build_batch_id_classifier(x, num_batches = 16):
   x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
   x_batch = tf.keras.layers.Dropout(0.2)(x_batch)
-  outputs_batch = tf.keras.layers.Dense(16, activation='softmax', name='outputs_batch')(x_batch)
+  outputs_batch = tf.keras.layers.Dense(num_batches, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
 
-def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector=True):
+def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16, use_hard_selector=True):
   image_size = (160, 160)
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
@@ -35,16 +35,16 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   x = tf.keras.layers.Activation('linear', name='activation')(x)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
-  outputs_batch = build_batch_id_classifier(x)
+  outputs_batch = build_batch_id_classifier(x, num_batches)
   if use_hard_selector:
     x_batch = tfa.seq2seq.hardmax(outputs_batch)
-    one_hot_predicted_batch = tf.keras.layers.Reshape([16, 1])(x_batch)
+    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(x_batch)
   else:
-    one_hot_predicted_batch = tf.keras.layers.Reshape([16, 1])(outputs_batch)
+    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(outputs_batch)
 
   conc_regressors = []
   grad_cam_inputs = []
-  for i in range(16):
+  for i in range(num_batches):
     grad_cam_inputs.append(tf.keras.Input(shape=[5, 5]))
     conc_regressors.append(build_regressor(x, grad_cam_inputs[i]))
   x_conc = tf.stack(conc_regressors, axis=1)
@@ -57,8 +57,8 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_select
   return model, pretrained_model
 
 
-def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir, use_hard_selector=True):
-  model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(use_hard_selector)
+def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, num_batches, model_dir, use_hard_selector=True):
+  model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches, use_hard_selector)
   pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
   model.summary()
   model.compile(loss={'outputs_batch': 'categorical_crossentropy',

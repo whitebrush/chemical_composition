@@ -2,7 +2,7 @@ import tensorflow as tf
 from typing import Dict, Optional, Text
 import glob
 
-def decode(serialized_example, add_gram_cam_features=False):
+def decode(serialized_example, label_columns, num_batches=16, add_gram_cam_features=False):
   # Decode examples stored in TFRecord
   # NOTE: make sure to specify the correct dimensions for the images
   feature_map = {
@@ -13,13 +13,11 @@ def decode(serialized_example, add_gram_cam_features=False):
           'feature/image/derivative_3': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/derivative_4': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
           'feature/image/derivative_5': tf.io.FixedLenFeature([160, 160, 3], tf.float32),
-          'label/5-HT': tf.io.FixedLenFeature([1], tf.float32),
-          'label/MEL': tf.io.FixedLenFeature([1], tf.float32),
-          'label/DA': tf.io.FixedLenFeature([1], tf.float32),
-          'label/NE': tf.io.FixedLenFeature([1], tf.float32), 
           'metadata/batch_id': tf.io.FixedLenFeature([1], tf.float32) }
+  for label_colume in label_columns:
+    feature_map[label_colume] = tf.io.FixedLenFeature([1], tf.float32)
   if add_gram_cam_features:
-    for batch_id in range(16):
+    for batch_id in range(num_batches):
       feature_map['feature/image/avg/heatmap_%d' % batch_id] = tf.io.FixedLenFeature([5, 5], tf.float32)
   feature_tensors = tf.io.parse_single_example(
       serialized_example,
@@ -36,12 +34,14 @@ def load_dataset(filename_pattern: Text,
                  label_columns: list, 
                  batch_size: int, 
                  prefetch_size: int, 
+                 num_batches: int = 16,
+                 add_gram_cam_features: bool = False,
                  repeat: Optional[int] = None):
   filenames = [filename_pattern] if '*' not in filename_pattern else glob.glob(filename_pattern)
   print(filenames)
   dataset = tf.data.Dataset.list_files(filenames).interleave(
       lambda filepath: tf.data.TFRecordDataset(filepath), cycle_length=2,)
-  dataset = dataset.map(decode, num_parallel_calls=2)
+  dataset = dataset.map(lambda x: decode(x, label_columns, num_batches, add_gram_cam_features), num_parallel_calls=2)
   dataset = dataset.filter(lambda x: tf.reduce_any(tf.math.is_nan(x['feature/image/avg'])) == False)
   dataset = dataset.map(lambda x: separate_features_and_labels(x, label_columns))
   dataset = dataset.repeat(repeat)

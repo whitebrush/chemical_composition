@@ -11,11 +11,11 @@ def build_regressor(x):
   x_conc = tf.keras.layers.Dense(4)(x_conc)
   return x_conc
 
-def build_CNN_2D_hard_regressor_selector_model():
+def build_CNN_2D_hard_regressor_selector_model(num_batches: int = 16):
   image_size = (160, 160)
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
-  batch_inputs = tf.keras.Input(shape=(16, 1))
+  batch_inputs = tf.keras.Input(shape=(num_batches, 1))
   pretrained_model = two_dim_and_finetune.load_pretrained_model(image_size=image_size,
                                            num_channels=num_channels, 
                                            include_top=False, 
@@ -28,7 +28,7 @@ def build_CNN_2D_hard_regressor_selector_model():
   x = tf.keras.layers.Normalization()(x)
 
   conc_regressors = []
-  for i in range(16):
+  for i in range(num_batches):
     conc_regressors.append(build_regressor(x))
   print(conc_regressors)
   x_conc = tf.stack(conc_regressors, axis=1)
@@ -50,8 +50,8 @@ def build_CNN_2D_hard_regressor_selector_model():
   return model, pretrained_model
 
 
-def train_CNN_2D_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, model_dir):
-  model, pretrained_model = build_CNN_2D_hard_regressor_selector_model()
+def train_CNN_2D_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, num_batches, model_dir):
+  model, pretrained_model = build_CNN_2D_hard_regressor_selector_model(num_batches)
   model.summary()
   history = model.fit(train_dataset, epochs=pretrained_epochs, validation_data=val_dataset)
 

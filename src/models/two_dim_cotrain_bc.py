@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from src.models import two_dim_and_finetune
 
-def build_CNN_2D_and_cotrain_bc_model():
+def build_CNN_2D_and_cotrain_bc_model(num_batches: int = 16):
   image_size = (160, 160)
   num_channels = 3
   inputs = tf.keras.Input(shape=image_size + (num_channels,))
@@ -25,7 +25,7 @@ def build_CNN_2D_and_cotrain_bc_model():
   x_batch_id = tf.keras.layers.Dropout(0.2)(x)
   x_batch_id = tf.keras.layers.Dense(16)(x_batch_id)
   x_batch_id = tf.keras.layers.Dropout(0.2)(x_batch_id)
-  outputs_batch_id = tf.keras.layers.Dense(16, activation='softmax')(x_batch_id)
+  outputs_batch_id = tf.keras.layers.Dense(num_batches, activation='softmax')(x_batch_id)
   model = tf.keras.Model(inputs, [outputs_conc, outputs_batch_id])
   base_learning_rate = 0.0001
   tf.keras.backend.set_epsilon(0.1)
