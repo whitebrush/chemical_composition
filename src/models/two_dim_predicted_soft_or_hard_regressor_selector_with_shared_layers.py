@@ -5,12 +5,12 @@ import tensorflow_addons as tfa
 from src.models import two_dim_and_finetune
 
 def build_fcc_classifier(x):
-  x = tf.keras.layers.Dense(16)(x)
+  x = tf.keras.layers.Dense(8)(x)
   return tf.keras.layers.Dense(4)(x)
   
 
 def build_batch_id_classifier(x, num_batches: int = 16):
-  x_batch = tf.keras.layers.Dense(4)(x)
+  x_batch = tf.keras.layers.Dense(32)(x)
   x_batch = tf.keras.layers.Dropout(0.1)(x_batch)
   outputs_batch = tf.keras.layers.Dense(num_batches, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
@@ -32,8 +32,8 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   conc_representation = tf.keras.Input(shape=(1280,))
   conc_dense = tf.keras.layers.Dropout(0.2)(conc_representation)
   conc_dense = tf.keras.layers.Dense(256)(conc_dense)
-#   conc_dense = tf.keras.layers.Dropout(0.1)(conc_dense)
-#   conc_dense = tf.keras.layers.Dense(64)(conc_dense)
+  conc_dense = tf.keras.layers.Dropout(0.1)(conc_dense)
+  conc_dense = tf.keras.layers.Dense(64)(conc_dense)
   conc_model = tf.keras.Model(conc_representation, conc_dense)
 
   outputs_batch = build_batch_id_classifier(conc_model(x), num_batches)
