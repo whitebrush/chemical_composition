@@ -30,10 +30,10 @@ def separate_features_and_labels(features: Dict, label_columns: list) -> Dict:
   return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), tf.concat(
     axis=-1,values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]])
 
-def load_dataset(filename_pattern: Text, 
-                 label_columns: list, 
-                 batch_size: int, 
-                 prefetch_size: int, 
+def load_dataset(filename_pattern: Text,
+                 label_columns: list,
+                 batch_size: int,
+                 prefetch_size: int,
                  num_batches: int = 16,
                  add_gram_cam_features: bool = False,
                  repeat: Optional[int] = None):
