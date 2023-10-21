@@ -4,10 +4,12 @@ import tensorflow_addons as tfa
 
 from src.models import two_dim_and_finetune
 
-def build_batch_id_classifier(x, num_batches=16):
+
+def build_batch_id_classifier(x, num_batches: int = 16):
   x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
   x_batch = tf.keras.layers.Dropout(0.2)(x_batch)
+  print("num_batches:=",num_batches)
   outputs_batch = tf.keras.layers.Dense(num_batches, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
 
@@ -16,10 +18,10 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   num_channels = 3
   image_inputs = tf.keras.Input(shape=image_size + (num_channels,))
   pretrained_model = two_dim_and_finetune.load_pretrained_model(image_size=image_size,
-                                           num_channels=num_channels, 
-                                           include_top=False, 
-                                           weights='imagenet', 
-                                           trainable=False, 
+                                           num_channels=num_channels,
+                                           include_top=False,
+                                           weights='imagenet',
+                                           trainable=False,
                                            num_top_trainable_layers=0)
   x = pretrained_model(image_inputs)
   x = tf.keras.layers.Activation('linear', name='activation')(x)
@@ -32,9 +34,10 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   else:
     one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(outputs_batch)
 
-  conc_representation = tf.keras.Input(shape=(5, 5,))
+
+  conc_representation = tf.keras.Input(shape=(1280,))
   conc_dense = tf.keras.layers.Dropout(0.2)(conc_representation)
-  conc_dense = tf.keras.layers.Dense(16)(conc_dense)
+  conc_dense = tf.keras.layers.Dense(32)(conc_dense)
   conc_dense = tf.keras.layers.Dropout(0.2)(conc_dense)
   conc_dense = tf.keras.layers.Dense(4)(conc_dense)
   conc_model = tf.keras.Model(conc_representation, conc_dense)
