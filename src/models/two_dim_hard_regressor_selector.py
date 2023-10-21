@@ -33,7 +33,7 @@ def build_CNN_2D_hard_regressor_selector_model(num_batches: int = 16):
   print(conc_regressors)
   x_conc = tf.stack(conc_regressors, axis=1)
   x_conc = tf.keras.layers.Multiply()([x_conc, batch_inputs])
-  x_conc = tf.keras.layers.Reshape([64])(x_conc)
+  x_conc = tf.keras.layers.Reshape([num_batches * 4])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear')(x_conc)
   print(outputs_conc)
   model = tf.keras.Model([image_inputs, batch_inputs], outputs_conc)

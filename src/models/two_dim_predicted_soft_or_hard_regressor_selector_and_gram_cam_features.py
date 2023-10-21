@@ -49,7 +49,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
     conc_regressors.append(build_regressor(x, grad_cam_inputs[i]))
   x_conc = tf.stack(conc_regressors, axis=1)
   x_conc = tf.keras.layers.Multiply()([x_conc, one_hot_predicted_batch])
-  x_conc = tf.keras.layers.Reshape([40])(x_conc)
+  x_conc = tf.keras.layers.Reshape([num_batches * 4])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear', name='outputs_conc')(x_conc)
   tf.keras.backend.set_epsilon(0.1)
   model = tf.keras.Model([image_inputs, grad_cam_inputs[0], grad_cam_inputs[1],grad_cam_inputs[2],grad_cam_inputs[3],grad_cam_inputs[4],grad_cam_inputs[5],grad_cam_inputs[6],grad_cam_inputs[7],grad_cam_inputs[8],grad_cam_inputs[9]], [outputs_batch, outputs_conc])

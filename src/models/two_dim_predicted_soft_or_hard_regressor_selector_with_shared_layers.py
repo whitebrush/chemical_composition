@@ -4,13 +4,6 @@ import tensorflow_addons as tfa
 
 from src.models import two_dim_and_finetune
 
-def build_regressor(x):
-  x_conc = tf.keras.layers.Dropout(0.2)(x)
-  x_conc = tf.keras.layers.Dense(16)(x_conc)
-  x_conc = tf.keras.layers.Dropout(0.2)(x_conc)
-  x_conc = tf.keras.layers.Dense(4)(x_conc)
-  return x_conc
-
 def build_batch_id_classifier(x, num_batches=16):
   x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
@@ -39,10 +32,17 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   else:
     one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(outputs_batch)
 
+  conc_representation = tf.keras.Input(shape=(5, 5,))
+  conc_dense = tf.keras.layers.Dropout(0.2)(conc_representation)
+  conc_dense = tf.keras.layers.Dense(16)(conc_dense)
+  conc_dense = tf.keras.layers.Dropout(0.2)(conc_dense)
+  conc_dense = tf.keras.layers.Dense(4)(conc_dense)
+  conc_model = tf.keras.Model(conc_representation, conc_dense)
   conc_regressors = []
   for i in range(num_batches):
-    conc_regressors.append(build_regressor(x))
+    conc_regressors.append(conc_model(x))
   x_conc = tf.stack(conc_regressors, axis=1)
+
   x_conc = tf.keras.layers.Multiply()([x_conc, one_hot_predicted_batch])
   x_conc = tf.keras.layers.Reshape([num_batches * 4])(x_conc)
   outputs_conc = tf.keras.layers.Dense(4, activation='linear', name='outputs_conc')(x_conc)
