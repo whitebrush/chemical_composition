@@ -19,7 +19,7 @@ def separate_features_and_labels(features: Dict, label_columns: list, num_batche
   return (tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), one_hot_encoder(features['metadata/batch_id'], num_batches)), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]])
 
-def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list) -> Dict:
+def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list, num_batches: int) -> Dict:
   return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), (one_hot_encoder(features['metadata/batch_id'], num_batches), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
