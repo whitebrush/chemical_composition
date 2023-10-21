@@ -6,7 +6,7 @@ from src.models import two_dim_and_finetune
 
 
 def build_batch_id_classifier(x, num_batches: int = 16):
-  x_batch = tf.keras.layers.Dense(16)(x_batch)
+  x_batch = tf.keras.layers.Dense(16)(x)
   x_batch = tf.keras.layers.Dropout(0.1)(x_batch)
   outputs_batch = tf.keras.layers.Dense(num_batches, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
