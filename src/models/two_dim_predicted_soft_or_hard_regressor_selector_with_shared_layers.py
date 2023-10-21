@@ -32,7 +32,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   conc_dense = tf.keras.layers.Dense(16)(conc_dense)
   conc_model = tf.keras.Model(conc_representation, conc_dense)
 
-  outputs_batch = build_batch_id_classifier(outputs_batch(x), num_batches)
+  outputs_batch = build_batch_id_classifier(conc_model(x), num_batches)
   if use_hard_selector:
     x_batch = tfa.seq2seq.hardmax(outputs_batch)
     one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(x_batch)
