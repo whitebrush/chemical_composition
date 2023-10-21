@@ -59,7 +59,7 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
 def train_CNN_2D_predicted_soft_or_hard_regressor_selector_model(train_dataset, val_dataset, pretrained_epochs, total_epochs, num_batches, model_dir, use_hard_selector=True, fine_tune=False):
   if not fine_tune:
     model, pretrained_model = build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches, use_hard_selector)
-    pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 5)
+    pretrained_model = two_dim_and_finetune.freeze_layers(pretrained_model, 12)
     model.summary()
     model.compile(loss={'outputs_batch': 'categorical_crossentropy',
                         'outputs_conc': [tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.SUM, name='mean_absolute_error'),
