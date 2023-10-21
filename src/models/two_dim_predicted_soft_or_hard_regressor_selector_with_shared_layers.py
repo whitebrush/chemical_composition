@@ -6,10 +6,8 @@ from src.models import two_dim_and_finetune
 
 
 def build_batch_id_classifier(x, num_batches: int = 16):
-  x_batch = tf.keras.layers.Dropout(0.2, name="batch_classifier_dropout_1")(x)
   x_batch = tf.keras.layers.Dense(16)(x_batch)
-  x_batch = tf.keras.layers.Dropout(0.2)(x_batch)
-  print("num_batches:=",num_batches)
+  x_batch = tf.keras.layers.Dropout(0.1)(x_batch)
   outputs_batch = tf.keras.layers.Dense(num_batches, activation='softmax', name='outputs_batch')(x_batch)
   return outputs_batch
 
@@ -27,19 +25,19 @@ def build_CNN_2D_predicted_soft_or_hard_regressor_selector_model(num_batches=16,
   x = tf.keras.layers.Activation('linear', name='activation')(x)
   x = tf.keras.layers.GlobalAveragePooling2D()(x)
   x = tf.keras.layers.Normalization()(x)
-  outputs_batch = build_batch_id_classifier(x, num_batches)
-  if use_hard_selector:
-    x_batch = tfa.seq2seq.hardmax(outputs_batch)
-    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(x_batch)
-  else:
-    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(outputs_batch)
-
   conc_representation = tf.keras.Input(shape=(1280,))
   conc_dense = tf.keras.layers.Dropout(0.2)(conc_representation)
   conc_dense = tf.keras.layers.Dense(256)(conc_dense)
   conc_dense = tf.keras.layers.Dropout(0.1)(conc_dense)
   conc_dense = tf.keras.layers.Dense(16)(conc_dense)
   conc_model = tf.keras.Model(conc_representation, conc_dense)
+
+  outputs_batch = build_batch_id_classifier(outputs_batch(x), num_batches)
+  if use_hard_selector:
+    x_batch = tfa.seq2seq.hardmax(outputs_batch)
+    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(x_batch)
+  else:
+    one_hot_predicted_batch = tf.keras.layers.Reshape([num_batches, 1])(outputs_batch)
   conc_regressors = []
   for i in range(num_batches):
     conc_regressors.append(tf.keras.layers.Dense(4)(conc_model(x)))
