@@ -11,7 +11,7 @@ def one_hot_encoder_from_numpy(batch_id_numpy, num_batches):
   return encoded_batch
 
 def one_hot_encoder(batch_id_tensor, num_batches):
-  result = tf.numpy_function(one_hot_encoder_from_numpy, [batch_id_tensor], tf.double)
+  result = tf.numpy_function(one_hot_encoder_from_numpy, [batch_id_tensor, num_batches], tf.double)
   result = tf.reshape(result, (num_batches, ))
   return result
 
