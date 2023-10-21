@@ -19,7 +19,7 @@ def separate_features_and_labels(features: Dict, label_columns: list, num_batche
   return (tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), one_hot_encoder(features['metadata/batch_id'], num_batches)), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]])
 
-def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list, num_batches: int) -> Dict:
+def separate_features_and_labels_one_hot_batch_id_as_labels(features: Dict, label_columns: list, num_batches) -> Dict:
   return tf.keras.applications.mobilenet_v2.preprocess_input(features['feature/image/avg']), (one_hot_encoder(features['metadata/batch_id'], num_batches), tf.concat(axis=-1,
               values=[features[label_columns[0]], features[label_columns[1]], features[label_columns[2]], features[label_columns[3]]]))
 
@@ -62,10 +62,13 @@ def load_dataset(filename_pattern: Text,
   if add_grad_cam_features:
     dataset = dataset.map(lambda x: separate_features_and_gram_cam_features_and_labels_one_hot_batch_id_as_labels(x, label_columns, num_batches))
   elif not one_hot_batch_id_as_label:
+    print("separate_features_and_labels")
     dataset = dataset.map(lambda x: separate_features_and_labels(x, label_columns, num_batches))
   elif not use_one_hot_function:
+    print("separate_features_and_labels_with_batch_id_as_labels")
     dataset = dataset.map(lambda x: separate_features_and_labels_with_batch_id_as_labels(x, label_columns))
   else:
+    print("separate_features_and_labels_one_hot_batch_id_as_labels")
     dataset = dataset.map(lambda x: separate_features_and_labels_one_hot_batch_id_as_labels(x, label_columns, num_batches))
   dataset = dataset.repeat(repeat)
   dataset = dataset.shuffle(2048)
